@@ -26,3 +26,5 @@ dist-ssr
 # Custom
 .env.dev
 .env
+db.json
+error.json
