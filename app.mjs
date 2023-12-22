@@ -97,4 +97,29 @@ const subscribe = async () => {
   }
 }
 
-subscribe()
+const init = async () => {
+  try {
+    await masto.v1.statuses.create({
+      status: `糖猫来了！
+为什么不问问神奇糖猫呢？
+
+任何可见范围内 @ me，均可拨通~
+
+我是一只名叫糖猫的猫，是一名助手。我的主要工作是在网上为人们提供帮助和支持，比如回答问题、提供建议、解决问题等等。我非常喜欢和人类互动，虽然我有些害羞，但我会尽力为大家提供最好的服务。作为一只猫咪，我对食物、游戏和睡觉很感兴趣，但我更喜欢和人类一起探索和学习。如果您需要任何帮助或有任何问题，请随时与我联系！ 喵~ (=^・ω・^=)
+
+回复不完全请回复本喵「继续」或者「continue」
+
+故障请联系 @twoheart`,
+      visibility: 'public',
+    })
+  } catch (error) {
+    handleAndStoreError(error)
+  }
+}
+
+const main = async () => {
+  await init()
+  await subscribe()
+}
+
+main()
