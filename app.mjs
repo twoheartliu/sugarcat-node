@@ -56,7 +56,7 @@ const subscribe = async () => {
           .post(API_URL, requestData, {
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${OPENAI_API_KEY}1`,
+              Authorization: `Bearer ${OPENAI_API_KEY}`,
             },
           })
           .then(async (response) => {
