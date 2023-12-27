@@ -21,7 +21,7 @@ export function extractPlainText(htmlContent) {
 }
 
 // 读取用户对话历史的函数
-export const readUserHistory = () => {
+export const readUserHistory = (userId) => {
   if (!fs.existsSync(dbFilePath)) {
     // 创建文件
     fs.writeFileSync(dbFilePath, '{}', 'utf-8')
@@ -29,7 +29,12 @@ export const readUserHistory = () => {
   }
   try {
     const data = fs.readFileSync(dbFilePath, 'utf8')
-    return JSON.parse(data) || {}
+    const jsonData = JSON.parse(data)
+    if (!jsonData[userId]) {
+      return []
+    } else {
+      return jsonData[userId]
+    }
   } catch (error) {
     console.error('Error reading user history:', error)
     return {}
@@ -37,14 +42,49 @@ export const readUserHistory = () => {
 }
 
 // 写入用户对话历史的函数
-export const writeUserHistory = (userHistories) => {
-  try {
-    fs.writeFileSync(dbFilePath, JSON.stringify(userHistories, null, 2), 'utf8')
-  } catch (error) {
-    console.error('Error writing user history:', error)
-  }
-}
+export function writeUserHistory(userId, userHistories) {
+  // 读取已存在的 JSON 文件
+  fs.readFile(dbFilePath, 'utf8', (readError, data) => {
+    if (readError) {
+      console.error('读取文件时出错：', readError)
+      return
+    }
 
+    try {
+      // 将 JSON 内容解析为 JavaScript 对象
+      const existingData = JSON.parse(data)
+
+      // 检查 userId 是否存在于 existingData 中
+      if (!existingData[userId]) {
+        // 如果不存在，创建一个新数组并赋值给 userId
+        existingData[userId] = []
+      }
+
+      // 用于调试目的的记录现有数据
+      console.log('existingData', existingData)
+
+      // 根据需要修改或追加数据（例如，添加到数组中）
+      console.log('userHistories', userHistories)
+      console.log('userId', userId)
+      // 使用 spread (...) 将各个元素推送到数组中
+      existingData[userId] = userHistories
+
+      // 将 JavaScript 对象转换回 JSON 字符串
+      const updatedJson = JSON.stringify(existingData, null, 2) // 最后一个参数（2）是缩进的空格数
+
+      // 将更新后的 JSON 字符串追加到已存在的文件
+      fs.writeFile(dbFilePath, updatedJson, 'utf8', (writeError) => {
+        if (writeError) {
+          console.error('写入文件时出错：', writeError)
+        } else {
+          console.log('数据成功追加到文件！')
+        }
+      })
+    } catch (parseError) {
+      console.error('解析 JSON 时出错：', parseError)
+    }
+  })
+}
 // Mastodon client
 export const masto = createRestAPIClient({
   url: URL,
